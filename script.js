@@ -91,14 +91,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // VIDEO MODAL
   const modal = document.getElementById('videoModal');
-  const modalVideo = document.getElementById('modalVideo');
+  const modalIframe = document.getElementById('modalVideo');
+  const modalLocalVideo = document.getElementById('modalVideoLocal');
   const modalClose = document.getElementById('modalClose');
 
   portfolioCards.forEach(card => {
     card.addEventListener('click', () => {
       const videoUrl = card.dataset.video;
+      const isLocal = card.dataset.type === 'local';
       if (videoUrl) {
-        modalVideo.src = videoUrl + '?autoplay=1';
+        if (isLocal) {
+          // Use HTML5 video player for local files
+          modalLocalVideo.src = videoUrl;
+          modalLocalVideo.style.display = 'block';
+          modalIframe.style.display = 'none';
+          modalIframe.src = '';
+          modalLocalVideo.play();
+        } else {
+          // Use iframe for YouTube/external embeds
+          modalIframe.src = videoUrl + '?autoplay=1';
+          modalIframe.style.display = 'block';
+          modalLocalVideo.style.display = 'none';
+          modalLocalVideo.src = '';
+        }
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
       }
@@ -107,7 +122,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const closeModal = () => {
     modal.classList.remove('active');
-    modalVideo.src = '';
+    modalIframe.src = '';
+    modalLocalVideo.pause();
+    modalLocalVideo.src = '';
+    modalLocalVideo.style.display = 'none';
+    modalIframe.style.display = 'block';
     document.body.style.overflow = '';
   };
 
